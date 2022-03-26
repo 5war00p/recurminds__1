@@ -8,8 +8,10 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { default as NextLink } from "next/link";
+import { useRouter } from "next/router";
 
 export default function Register() {
+  const router =useRouter();
   const handleSubmit = (event: any) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -17,6 +19,8 @@ export default function Register() {
       email: data.get("email"),
       password: data.get("password"),
     });
+    router.replace("/add-profiles");
+
   };
 
   return (
