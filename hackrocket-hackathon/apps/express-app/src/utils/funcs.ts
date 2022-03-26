@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import { sign } from "jsonwebtoken";
 import { publicEnv } from "../../env";
+import { Request } from "express";
 
 const JWT_ACCESS_SECRET = publicEnv.ACCESS_TOKEN_SECRET || "access secret";
 const ACCESS_EXPIRY_TIME = publicEnv.ACCESS_EXPIRY_TIME || "1h";
@@ -38,6 +39,7 @@ const sendError = (
   res.status(resCode);
   res.json(message);
   res.end();
+  return res;
 };
 
 const sendSuccess = (
@@ -101,9 +103,9 @@ const get_hash = (passwd: string | Buffer) => {
   return bcrypt.hashSync(passwd, salt);
 };
 
-const getJwtFromHeaders = (req: { headers: { [x: string]: string } }) => {
+const getJwtFromHeaders = (req: Request) => {
   const access_token = req.headers["x-dev-profile-access-token"] || "";
-  return access_token;
+  return typeof access_token === "string" ? access_token : access_token[0];
 };
 
 export const funcs = {

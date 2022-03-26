@@ -1,9 +1,7 @@
 import { Router, Request, Response } from "express";
 
-const router = Router();
+export const router = Router();
 
 router.get("/other", async (req: Request, res: Response) => {
-  res.send("Auth set");
+  return res.json({ message: "Auth set" });
 });
-
-export default router;

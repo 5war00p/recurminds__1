@@ -4,7 +4,7 @@ import { Router, Request, Response } from "express";
 import { funcs } from "../utils/funcs";
 import { jwtManager } from "../utils/jwtManager";
 
-const router = Router();
+export const router = Router();
 
 router.get("/login", async (req: Request, res: Response) => {
   res.send("Come on login I sayyy");
