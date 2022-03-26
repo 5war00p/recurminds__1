@@ -17,8 +17,8 @@ export const db = async (): Promise<void> => {
 };
 
 export const models = {
-  User: import("./User"),
-  PlatformProfile: import("./PlatformProfile"),
-  Profile: import("./Profile"),
-  Connection: import("./Connection"),
+  User: require("./User"),
+  PlatformProfile: require("./PlatformProfile"),
+  Profile: require("./Profile"),
+  Connection: require("./Connection"),
 };
