@@ -1,6 +1,7 @@
 import { ThemeProvider } from "@mui/material";
 import type { AppProps } from "next/app";
 import Head from "next/head";
+import AppTopBar from "../components/app-bar";
 import { theme } from "../theme";
 
 function MyApp({ Component, pageProps }: AppProps) {
