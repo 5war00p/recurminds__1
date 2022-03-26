@@ -26,14 +26,14 @@ router.post("/login", (req, res) => {
         save: () => any;
       }) => {
         if (!user)
-          throw {
-            err_message: "Seems entered user details not exists!",
-            err_code: 401,
-          };
+          return funcs.sendError(
+            res,
+            "Seems entered user details not exists!",
+            401
+          );
 
         const auth = bcrypt.compareSync(password, user.password);
-        if (!auth)
-          throw { err_message: "Incorrect credentials", err_code: 401 };
+        if (!auth) return funcs.sendError(res, "Incorrect credentials", 401);
 
         jwt_data = {
           data: {
@@ -79,7 +79,7 @@ router.post("/register", (req, res) => {
           password: password,
           email: email,
         });
-      throw { err_message: "Username already exists!", err_code: 400 };
+      return funcs.sendError(res, "Username already exists!", 400);
     })
     .then((user: { _id: any; last_login: Date; save: () => any }) => {
       jwt_data = {
@@ -106,7 +106,7 @@ router.delete("/logout", jwtManager, (req: any, res: Response, next) => {
 
   models.User.findOneAndUpdate({ _id }, { $unset: { refresh_token: 1 } })
     .then((user: any) => {
-      if (!user) throw { err_message: "User not exists!", err_code: 401 };
+      if (!user) return funcs.sendError(res, "User not exists!", 401);
 
       return funcs.sendSuccess(res, "Loggedout Successfully !!", 200, null);
     })
