@@ -16,15 +16,28 @@ router.post("/login", (req, res) => {
 
   let jwt_data: string | object;
   let access_token: string;
-  models.User.findOne({ username, email })
+  models.Profile.findOne({ username, email })
     .then((user: any) => {
+      let auth: boolean;
       if (!user)
-        throw {
-          err_message: "Seems entered user details not exists!",
-          err_code: 401,
-        };
+        return funcs.sendError(
+          res,
+          "Seems entered user details not exists!",
+          401
+        );
 
-      const auth = bcrypt.compareSync(password, user.password);
+      auth = bcrypt.compareSync(password, user.password);
+      if (!auth) return funcs.sendError(res, "Incorrect credentials", 401);
+
+      jwt_data = {
+        data: {
+          id: user._id,
+        },
+        isloggedIn: true,
+        version: process.env.VERSION,
+      };
+
+      auth = bcrypt.compareSync(password, user.password);
       if (!auth) throw { err_message: "Incorrect credentials", err_code: 401 };
 
       jwt_data = {
@@ -65,12 +78,15 @@ router.post("/register", (req, res) => {
   models.User.findOne({ username })
     .then((user: any) => {
       if (!user)
-        return models.User.create({
+        return models.Profile.create({
           username: username,
           password: password,
           email: email,
         });
-      throw { err_message: "Username already exists!", err_code: 400 };
+      return funcs.sendError(res, "Username already exists!", 400);
+    })
+    .then((profile: { _id: any }) => {
+      return models.User.create({ profile: profile._id });
     })
     .then((user: { _id: any; last_login: Date; save: () => any }) => {
       jwt_data = {
@@ -95,9 +111,9 @@ router.post("/register", (req, res) => {
 router.post("/logout", jwtManager, (req: any, res: Response, next) => {
   const _id = req.jwt_data.data.id;
 
-  models.User.findOneAndUpdate({ _id }, { $unset: { refresh_token: 1 } })
+  models.User.findOneAndUpdate({ _id }, { $unset: { access_token: 1 } })
     .then((user: any) => {
-      if (!user) throw { err_message: "User not exists!", err_code: 401 };
+      if (!user) return funcs.sendError(res, "User not exists!", 401);
 
       return funcs.sendSuccess(res, "Loggedout Successfully !!", 200, null);
     })

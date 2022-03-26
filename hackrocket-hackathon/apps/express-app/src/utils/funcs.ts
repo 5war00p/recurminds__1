@@ -39,7 +39,7 @@ const sendError = (
   res.status(resCode);
   res.json(message);
   res.end();
-  return res;
+  return;
 };
 
 const sendSuccess = (

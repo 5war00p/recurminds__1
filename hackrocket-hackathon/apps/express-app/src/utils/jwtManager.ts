@@ -6,7 +6,6 @@ import { funcs } from "./funcs";
 const JWT_ACCESS_SECRET = publicEnv.ACCESS_TOKEN_SECRET || "access secret";
 
 export const jwtManager = (req: Request, res: Response, next: NextFunction) => {
-  // return (req: Request, res: Response, next: NextFunction) => {
   const baseUrl = req.baseUrl.split("/").reverse()[0];
   const access_token = funcs.getJwtFromHeaders(req);
   if (!access_token && baseUrl !== "auth")
@@ -15,10 +14,6 @@ export const jwtManager = (req: Request, res: Response, next: NextFunction) => {
   verify(access_token, JWT_ACCESS_SECRET, (err: any, data: any) => {
     if (err) {
       if (err.name === "TokenExpiredError")
-        // throw {
-        //   err_message: "Authentication token expired!",
-        //   err_code: 401,
-        // };
         return funcs.sendError(res, "Authentication token expired", 401);
       return funcs.sendError(res, "Invalid authentication token!", 401);
     }
@@ -33,5 +28,4 @@ export const jwtManager = (req: Request, res: Response, next: NextFunction) => {
     req.body.jwt_data = data;
     next();
   });
-  // };
 };
