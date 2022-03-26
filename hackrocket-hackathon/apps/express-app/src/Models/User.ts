@@ -1,11 +1,25 @@
 import mongoose from "mongoose";
 
-const { Schema } = mongoose;
+export const UserSchema = new mongoose.Schema(
+  {
+    authentication_token: {
+      type: String,
+    },
+    connections: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Connection",
+      },
+    ],
+    platform_profiles: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "PlatformProfile",
+      },
+    ],
+  },
+  { timestamps: true }
+) as never;
 
-const User = new Schema({
-  email: Schema.Types.String,
-  password: Schema.Types.String,
-});
-
-const UserModel = new mongoose.Model("user", User);
+const UserModel = mongoose.model("User", UserSchema);
 export default UserModel;
