@@ -1,10 +1,12 @@
-import { Button } from "@mui/material";
-
+import AppTopBar from "../components/app-bar";
+import Login from "./login";
+import Register from "./register";
 export default function Web() {
   return (
     <div>
-      <h1>Web</h1>
-      <Button variant="contained"> button </Button>
+      <AppTopBar/>
+      <Login />
+      <Register />
     </div>
   );
 }
