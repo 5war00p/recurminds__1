@@ -15,7 +15,7 @@ router.post("/login", (req, res) => {
 
   let jwt_data: string | object;
   let access_token: string;
-  models.User.findOne({ username, email })
+  models.Profile.findOne({ username, email })
     .then(
       (user: {
         password: any;
@@ -74,12 +74,15 @@ router.post("/register", (req, res) => {
   models.User.findOne({ username })
     .then((user: any) => {
       if (!user)
-        return models.User.create({
+        return models.Profile.create({
           username: username,
           password: password,
           email: email,
         });
       return funcs.sendError(res, "Username already exists!", 400);
+    })
+    .then((profile: { _id: any }) => {
+      return models.User.create({ profile: profile._id });
     })
     .then((user: { _id: any; last_login: Date; save: () => any }) => {
       jwt_data = {
@@ -104,7 +107,7 @@ router.post("/register", (req, res) => {
 router.delete("/logout", jwtManager, (req: any, res: Response, next) => {
   const _id = req.jwt_data.data.id;
 
-  models.User.findOneAndUpdate({ _id }, { $unset: { refresh_token: 1 } })
+  models.User.findOneAndUpdate({ _id }, { $unset: { access_token: 1 } })
     .then((user: any) => {
       if (!user) return funcs.sendError(res, "User not exists!", 401);
 
