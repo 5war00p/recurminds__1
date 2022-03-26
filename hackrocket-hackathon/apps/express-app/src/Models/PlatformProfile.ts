@@ -17,4 +17,4 @@ const PlatformProfileModel = mongoose.model(
   "PlatformProfile",
   PlatformProfileSchema
 );
-export default PlatformProfileModel;
+export { PlatformProfileModel };

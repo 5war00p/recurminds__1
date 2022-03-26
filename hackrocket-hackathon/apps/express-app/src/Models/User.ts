@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-export const UserSchema = new mongoose.Schema(
+const UserSchema = new mongoose.Schema(
   {
     authentication_token: {
       type: String,
@@ -22,4 +22,4 @@ export const UserSchema = new mongoose.Schema(
 ) as never;
 
 const UserModel = mongoose.model("User", UserSchema);
-export default UserModel;
+export { UserModel };
