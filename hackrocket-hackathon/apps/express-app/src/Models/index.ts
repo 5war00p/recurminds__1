@@ -19,8 +19,9 @@ export const db = async (): Promise<void> => {
   }
 };
 
-export const Models = {
-  User: UserModel,
-  Profile: ProfileModel,
-  PlatformProfile: PlatformProfileModel,
+export const models = {
+  User: require("./User"),
+  PlatformProfile: require("./PlatformProfile"),
+  Profile: require("./Profile"),
+  Connection: require("./Connection"),
 };
