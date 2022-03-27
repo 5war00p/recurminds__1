@@ -5,7 +5,7 @@ import { funcs } from "./funcs";
 
 const JWT_ACCESS_SECRET = publicEnv.ACCESS_TOKEN_SECRET || "access secret";
 
-export const jwtManager = (req: Request, res: Response, next: NextFunction) => {
+export const jwtManager = (req: any, res: Response, next: NextFunction) => {
   const baseUrl = req.baseUrl.split("/").reverse()[0];
   const access_token = funcs.getJwtFromHeaders(req);
   if (!access_token && baseUrl !== "auth")
@@ -25,7 +25,7 @@ export const jwtManager = (req: Request, res: Response, next: NextFunction) => {
 
     delete data["exp"];
     delete data["iat"];
-    req.body.jwt_data = data;
+    req.jwt_data = data;
     next();
   });
 };

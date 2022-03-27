@@ -15,7 +15,7 @@ const sendError = (
     end: () => void;
   },
   err: string,
-  resCode: number
+  resCode?: number
 ) => {
   err = err || "Internal server error";
   resCode = resCode || 500;
@@ -50,17 +50,15 @@ const sendSuccess = (
     end: () => void;
   },
   data: undefined | any,
-  resCode: number | undefined,
-  access_token: any | undefined
+  resCode?: number | undefined,
+  access_token?: any | undefined
 ) => {
   resCode = resCode || 200;
   data = data === undefined ? {} : data;
-  let message = {
+  let message: any = {
     code: resCode,
     status: "success",
     data: data,
-    access_token: "",
-    refresh_token: "",
   };
   if (access_token) message["access_token"] = access_token;
 
