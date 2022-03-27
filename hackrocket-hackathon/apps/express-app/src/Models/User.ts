@@ -1,7 +1,11 @@
 import mongoose from "mongoose";
 
-const UserSchema = new mongoose.Schema(
+export const UserSchema = new mongoose.Schema(
   {
+    profile: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Profile",
+    },
     authentication_token: {
       type: String,
     },
@@ -19,7 +23,7 @@ const UserSchema = new mongoose.Schema(
     ],
   },
   { timestamps: true }
-) as never;
+);
 
 const UserModel = mongoose.model("User", UserSchema);
 export { UserModel };

@@ -1,5 +1,6 @@
 import { connect } from "mongoose";
 import { publicEnv } from "../../env";
+import ConnectionModel from "./Connection";
 import { PlatformProfileModel } from "./PlatformProfile";
 import { ProfileModel } from "./Profile";
 import { UserModel } from "./User";
@@ -19,8 +20,9 @@ export const db = async (): Promise<void> => {
   }
 };
 
-export const Models = {
+export const models = {
   User: UserModel,
-  Profile: ProfileModel,
   PlatformProfile: PlatformProfileModel,
+  Profile: ProfileModel,
+  Connection: ConnectionModel,
 };
