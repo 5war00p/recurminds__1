@@ -11,7 +11,15 @@ const app = express();
 
 app.set("case sensitive routing", true);
 app.use(express.json({ limit: "5MB" }));
-app.use(cors());
+app.use(
+  cors({
+    credentials: true,
+    origin: ["http://localhost", "http://localhost:3000"],
+    allowedHeaders: ["x-dev-profile-access-token", "content-type"],
+    methods: ["GET", "POST", "PUT", "DELETE "],
+    exposedHeaders: ["x-dev-profile-access-token"],
+  })
+);
 
 app.use("/auth", AuthRoutes);
 app.use("/profile", jwtManager, ProfileRoutes);

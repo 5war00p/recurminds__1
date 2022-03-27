@@ -1,12 +1,14 @@
 import { CircularProgress, Grid } from "@mui/material";
 import { useRouter } from "next/router";
 import React, { useContext, useEffect, useState } from "react";
+import { interceptedAxios } from "../intrerceptors";
 
 interface UserContext {
   isLoggedIn: boolean;
-  login: () => void;
+  login: (data: UserDataInput) => void;
   logout: () => void;
   userData: UserData | [];
+  RequestError?: string;
 }
 
 interface UserData {
@@ -29,23 +31,64 @@ export const UserContextProvider = ({
 }) => {
   const [userData, setUserData] = useState<UserData | []>([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isLoading, setLoading] = useState(false);
+  const [isLoading, setLoading] = useState(true);
+  const [RequestError, setError] = useState("");
   const router = useRouter();
+
   useEffect(() => {
     setLoading(true);
-    if (isLoggedIn) {
-      if (["/register", "/login"].includes(router.pathname))
-        router.replace("/home");
+    if (window) {
+      const AccessToken = localStorage.getItem("access_token");
+      if (AccessToken) {
+        setIsLoggedIn(true);
+      } else {
+        setIsLoggedIn(false);
+      }
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
-  const login = () => {
-    return;
+  useEffect(() => {
+    if (!isLoading) {
+      if (isLoggedIn) {
+        if (["/register", "/login"].includes(router.pathname))
+          router.replace("/home");
+      } else {
+        if (!["/register", "/login"].includes(router.pathname)) {
+          router.replace("/login");
+        }
+      }
+    }
+  }, [isLoggedIn, router, isLoading]);
+
+  const login = async (data: UserDataInput) => {
+    if (data?.username && data?.password) {
+      try {
+        const req = await interceptedAxios.post(
+          "/auth/login",
+          { ...data },
+          { withCredentials: true }
+        );
+        if (req.status === 200) {
+          const { access_token } = req?.data;
+          if (access_token) {
+            window && localStorage.setItem("access_token", access_token);
+            localStorage.setItem("username", req?.data?.data.username);
+            setIsLoggedIn(true);
+            setTimeout(() => {
+              router.push("/home");
+            }, 3000);
+          }
+        }
+      } catch (error) {
+        console.log(error);
+        setError(error.response?.data?.message || "Error");
+      }
+    }
   };
   const logout = () => {
     return;
   };
-  const values = { login, logout, isLoggedIn, userData };
+  const values = { login, logout, isLoggedIn, userData, RequestError };
   return (
     <UserContext.Provider value={values}>
       {isLoading ? (

@@ -9,23 +9,81 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { default as NextLink } from "next/link";
 import { useRouter } from "next/router";
+import { interceptedAxios } from "../intrerceptors";
+import { Alert, AlertTitle, Collapse } from "@mui/material";
 
 export default function Register() {
-  const router =useRouter();
-  const handleSubmit = (event: any) => {
+  const router = useRouter();
+  const [username, setUsername] = React.useState<string | null>();
+  const [email, setEmail] = React.useState<string | null>();
+  const [password, setPassword] = React.useState<string | null>();
+  const [error, setError] = React.useState(false);
+  const [helperText, setHelperText] = React.useState<string | null>();
+  const [submitting, setSubmitting] = React.useState(false);
+  const [errorText, setErrorText] = React.useState("");
+  const handleSubmit = async (event: any) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
-    });
-    router.replace("/add-profiles");
-
+    setSubmitting(true);
+    const data = { username, email, password };
+    if (!username || !email || !password) {
+      setError(true);
+      setErrorText("Please fill all fields");
+      setSubmitting(false);
+      return;
+    }
+    try {
+      const req = await interceptedAxios.post(
+        "auth/register",
+        { ...data },
+        { withCredentials: true }
+      );
+      console.log(req);
+      if (req.status === 201) {
+        console.log("Created Account");
+        router.replace("/login");
+      } else {
+        console.log(req.data);
+      }
+    } catch (error) {
+      console.log(error);
+      setError(true);
+      setErrorText(error?.response?.data.message);
+    }
+    setSubmitting(false);
   };
 
+  const checkUsername = async () => {
+    if (!username) {
+      return;
+    }
+    try {
+      const req = await interceptedAxios.post("auth/check-username", {
+        username,
+      });
+      console.log(req.data);
+      if (req.status === 200) {
+        setHelperText(req.data?.message);
+      }
+    } catch (error) {
+      console.log(error.response.data);
+      setHelperText(error?.response?.data.message);
+    }
+  };
+  React.useEffect(() => {
+    if (error) {
+      setTimeout(() => {
+        setError(false);
+      }, 3000);
+    }
+  }, [error]);
   return (
-    <Container component="main" maxWidth="xs">
-      <CssBaseline />
+    <Container component="main" maxWidth="xs" style={{ marginTop: 20 }}>
+      <Collapse in={error}>
+        <Alert severity="warning">
+          <AlertTitle>Wraning!</AlertTitle>
+          {errorText}
+        </Alert>
+      </Collapse>
       <Box
         sx={{
           marginTop: 8,
@@ -49,6 +107,9 @@ export default function Register() {
             name="username"
             autoComplete="username"
             autoFocus
+            onChange={(e) => setUsername(e.target.value)}
+            onBlur={checkUsername}
+            helperText={helperText}
           />
           <TextField
             margin="normal"
@@ -58,6 +119,7 @@ export default function Register() {
             label="Email Address"
             name="email"
             autoComplete="email"
+            onChange={(e) => setEmail(e.target.value)}
           />
           <TextField
             margin="normal"
@@ -68,6 +130,7 @@ export default function Register() {
             type="password"
             id="password"
             autoComplete="current-password"
+            onChange={(e) => setPassword(e.target.value)}
           />
 
           <Button
@@ -75,8 +138,9 @@ export default function Register() {
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2, height: 45 }}
+            disabled={submitting}
           >
-            Sign up
+            {submitting ? "Submitting..." : "Sign up"}
           </Button>
         </Box>
       </Box>

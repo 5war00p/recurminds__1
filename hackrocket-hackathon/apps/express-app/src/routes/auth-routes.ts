@@ -33,6 +33,7 @@ router.post("/login", async (req, res) => {
         id: profile._id,
       },
       version: process.env.VERSION,
+      username,
     };
     access_token = funcs.genJWT(jwt_data);
     let user: any = await models.User.findOneAndUpdate(
@@ -40,13 +41,13 @@ router.post("/login", async (req, res) => {
       { access_token: access_token }
     );
     await user.save();
-    return funcs.sendSuccess(res, jwt_data, 201, access_token);
+    return funcs.sendSuccess(res, jwt_data, 200, access_token);
   } catch (err: any) {
     return funcs.sendError(res, err.err_message || err, err.err_code);
   }
 });
 
-router.post("/signup", async (req, res) => {
+router.post("/register", async (req, res) => {
   let { username, email, password } = req.body;
 
   if (!username || !email || !password) {
@@ -58,7 +59,7 @@ router.post("/signup", async (req, res) => {
   let jwt_data: string | object;
   let access_token: string;
   try {
-    let user: any = await models.User.findOne({ username });
+    let user: any = await models.Profile.findOne({ username });
     if (!user) {
       const profile = await models.Profile.create({
         username: username,
@@ -75,7 +76,7 @@ router.post("/signup", async (req, res) => {
       access_token = funcs.genJWT(jwt_data);
     } else return funcs.sendError(res, "Username already exists!", 400);
 
-    return funcs.sendSuccess(res, jwt_data, 201, access_token);
+    return funcs.sendSuccess(res, jwt_data, 201);
   } catch (err: any) {
     return funcs.sendError(res, err.err_message || err, err.err_code);
   }
@@ -97,11 +98,19 @@ router.delete("/logout", jwtManager, async (req: any, res: Response, next) => {
 
 router.post("/check-username", async (req, res) => {
   const { username } = req.body;
-  const user = await models.User.findOne({ "profile.username": username });
-  console.log(user);
+  const user = await models.Profile.findOne({ username });
   if (user) {
-    return res.status(401).json({ message: "User Already exits" });
+    return res.status(403).json({ message: "User Already exits" });
   } else {
     return res.status(200).json({ message: "Username Available" });
   }
+});
+
+router.get("/platforms", async (req, res) => {
+  const { username } = req.query;
+  const profile = await models.Profile.findOne({ username });
+  if (!profile) return res.status(404).json({ message: "No Data found" });
+  const user = await models.User.findOne({ profile: profile?._id });
+  if (!user) return res.status(404).json({ message: "No Data found" });
+  return res.json({ platform_profiles: user.platform_profiles });
 });

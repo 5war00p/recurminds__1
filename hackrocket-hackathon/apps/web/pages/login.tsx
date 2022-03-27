@@ -8,21 +8,43 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { default as NextLink } from "next/link";
+import { useUserContext } from "../context/userContext";
+import { Alert, AlertTitle, Collapse } from "@mui/material";
 
 export default function SignIn() {
+  const [username, setUsername] = React.useState<string>("");
+  const [password, setPassword] = React.useState<string>("");
+  const [error, setError] = React.useState(false);
+  const [submitting, setSubmitting] = React.useState(false);
+  const [errorText, setErrorText] = React.useState("");
+  const { RequestError, login } = useUserContext();
   const handleSubmit = (event: any) => {
+    setSubmitting(true);
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
-    });
+    const data = { username, password };
+    if (!username || !password) {
+      setError(true);
+      setErrorText("Please fill all fields");
+      return;
+    }
+    login(data);
+    setSubmitting(false);
   };
+
+  React.useEffect(() => {
+    if (RequestError) {
+      alert(RequestError);
+    }
+  }, [RequestError]);
 
   return (
     <Container component="main" maxWidth="xs">
-      <CssBaseline />
+      <Collapse in={error}>
+        <Alert severity="warning">
+          <AlertTitle>Wraning!</AlertTitle>
+          {errorText}
+        </Alert>
+      </Collapse>
       <Box
         sx={{
           marginTop: 8,
@@ -41,11 +63,12 @@ export default function SignIn() {
             margin="normal"
             required
             fullWidth
-            id="email"
-            label="Email Address"
-            name="email"
-            autoComplete="email"
+            id="username"
+            label="Username"
+            name="username"
+            autoComplete="username"
             autoFocus
+            onChange={(e) => setUsername(e.target.value)}
           />
           <TextField
             margin="normal"
@@ -56,31 +79,29 @@ export default function SignIn() {
             type="password"
             id="password"
             autoComplete="current-password"
+            onChange={(e) => setPassword(e.target.value)}
           />
 
           <Button
             type="submit"
             fullWidth
             variant="contained"
+            disabled={submitting}
             sx={{ mt: 3, mb: 2, height: 45 }}
           >
-            Sign In
+            {submitting ? "Submitting..." : "Sign In"}
           </Button>
         </Box>
       </Box>
       <Grid container>
         <Grid item xs>
           <NextLink href={"/forgest-password"} passHref={true}>
-            <Link variant="body2">
-              <a>Forgot password? </a>
-            </Link>
+            <Link variant="body2">Forgot password?</Link>
           </NextLink>
         </Grid>
         <Grid item>
           <NextLink href={"/register"} passHref>
-            <Link variant="body2">
-              <a>{"Don't have an account? Sign Up"} </a>
-            </Link>
+            <Link variant="body2">{"Don't have an account? Sign Up"}</Link>
           </NextLink>
         </Grid>
       </Grid>
