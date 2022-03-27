@@ -1,6 +1,5 @@
 import bcrypt from "bcrypt";
 import { models } from "../models";
-import { UserSchema } from "../models/User";
 import { Router, Request, Response } from "express";
 import { funcs } from "../utils/funcs";
 import { jwtManager } from "../utils/jwtManager";
@@ -94,9 +93,7 @@ router.delete("/logout", jwtManager, async (req: any, res: Response, next) => {
 
 router.post("/check-username", async (req, res) => {
   const { username } = req.body;
-  const users = await models.User.find({});
-  console.log(users);
-  const user = await models.User.findOne({ user: { username: username } });
+  const user = await models.User.findOne({ "profile.username": username });
   console.log(user);
   if (user) {
     return res.status(401).json({ message: "User Already exits" });
