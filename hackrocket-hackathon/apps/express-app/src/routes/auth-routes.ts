@@ -83,9 +83,10 @@ router.post("/register", (req, res) => {
           password: password,
           email: email,
         });
-      return funcs.sendError(res, "Username already exists!", 400);
+      funcs.sendError(res, "Username already exists!", 400);
+      return;
     })
-    .then((profile: { _id: any }) => {
+    .then((profile: any) => {
       return models.User.create({ profile: profile._id });
     })
     .then((user: { _id: any; last_login: Date; save: () => any }) => {
@@ -131,5 +132,4 @@ router.post("/check-username", async (req, res) => {
   } else {
     return res.status(200).json({ message: "Username Available" });
   }
-  return res;
 });
