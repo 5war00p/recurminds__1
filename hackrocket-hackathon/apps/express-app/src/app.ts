@@ -6,6 +6,7 @@ import { jwtManager } from "./utils/jwtManager";
 import { router as AuthRoutes } from "./routes/auth-routes";
 import { router as ProfileRoutes } from "./routes/profile-routes";
 import { router as ConnectionRoutes } from "./routes/connection-routes";
+import { router as PlatformRoutes } from "./routes/platform-routes";
 
 import { funcs } from "./utils/funcs";
 
@@ -18,6 +19,7 @@ app.use(cors());
 app.use("/auth", AuthRoutes);
 app.use("/profile", jwtManager, ProfileRoutes);
 app.use("/conn", jwtManager, ConnectionRoutes);
+app.use("/platform", jwtManager, PlatformRoutes);
 
 app.use(
   (
