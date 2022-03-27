@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-title-in-document-head */
 import { Html, Head, Main, NextScript } from "next/document";
 
 export default function Document() {
@@ -27,6 +28,7 @@ export default function Document() {
           content="A Simple web app to the statics of the User's Coding Profile"
         />
         <meta name="title" content="Social Coding Exercise" />
+        <title>Social Coding Experience</title>
       </Head>
       <body>
         <Main />

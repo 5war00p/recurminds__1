@@ -1,16 +1,15 @@
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import AppTopBar from "../components/app-bar";
+import { useUserContext } from "../context/userContext";
 import Login from "./login";
 import Register from "./register";
 export default function Web() {
   const router = useRouter();
+  const { isLoggedIn } = useUserContext();
   useEffect(() => {
-    if (window) {
-      const isLogged = localStorage.getItem("isLogged");
-      if (isLogged) {
-        router.replace("/home", {}, {});
-      }
+    if (isLoggedIn) {
+      router.replace("/home");
     }
   }, []);
   return (
