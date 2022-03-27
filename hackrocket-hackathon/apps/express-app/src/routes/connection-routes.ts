@@ -32,6 +32,16 @@ router.get("/", async (req: any, res: Response, next) => {
   }
 });
 
+router.get("/search", async (req, res) => {
+  const { user } = req.query;
+  if (!user)
+    return res.json({ type: "error", message: "Please provide input" });
+  const profiles = await models.Profile.find({
+    username: { $regex: user },
+  }).select({ username: 1 });
+  return res.json({ message: "success", data: profiles });
+});
+
 router.post("/friend/req", async (req: any, res: Response, next) => {
   const _id = req.jwt_data.data.id;
   const { requesting_user_id } = req.body;
