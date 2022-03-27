@@ -58,7 +58,7 @@ router.post("/signup", async (req, res) => {
   let jwt_data: string | object;
   let access_token: string;
   try {
-    let user: any = await models.User.findOne({ username });
+    let user: any = await models.Profile.findOne({ username });
     if (!user) {
       const profile = await models.Profile.create({
         username: username,

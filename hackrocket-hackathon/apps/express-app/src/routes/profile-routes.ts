@@ -17,9 +17,7 @@ router.get("/", async (req: any, res: Response, next) => {
       .populate([
         {
           path: "profile",
-          populate: [{ path: "friends" }, { path: "followers" }],
         },
-        { path: "connections" },
         { path: "platform_profiles" },
       ]);
 
