@@ -10,108 +10,83 @@ router.get("/login", async (req: Request, res: Response) => {
   res.send("Come on login I sayyy");
 });
 
-router.post("/login", (req, res) => {
+router.post("/login", async (req, res) => {
   const { username, password, email } = req.body;
+
+  if ((!username && !email) || !password)
+    return funcs.sendError(res, "Missing some required fields!", 422);
 
   let jwt_data: string | object;
   let access_token: string;
-  models.Profile.findOne({ username, email })
-    .then(
-      (user: {
-        password: any;
-        _id: any;
-        email: string;
-        username: string;
-        last_login: Date;
-        save: () => any;
-      }) => {
-        if (!user)
-          return funcs.sendError(
-            res,
-            "Seems entered user details not exists!",
-            401
-          );
-
-        const auth = bcrypt.compareSync(password, user.password);
-        if (!auth) return funcs.sendError(res, "Incorrect credentials", 401);
-
-        jwt_data = {
-          data: {
-            id: user._id,
-          },
-          isloggedIn: true,
-          version: process.env.VERSION,
-        };
-        access_token = funcs.genJWT(jwt_data);
-        user.last_login = new Date();
-        return user.save();
-      }
-    )
-    .then((_: any) => {
-      return funcs.sendSuccess(res, jwt_data, 201, access_token);
-    })
-    .catch((err: { err_message: any; err_code: any }) => {
-      return funcs.sendError(res, err.err_message || err, err.err_code);
-    });
+  try {
+    let user: any = await models.Profile.findOne({ username, email });
+    if (!user)
+      return funcs.sendError(
+        res,
+        "Seems entered user details not exists!",
+        401
+      );
+    const auth = bcrypt.compareSync(password, user.password);
+    if (!auth) return funcs.sendError(res, "Incorrect credentials", 401);
+    jwt_data = {
+      data: {
+        id: user._id,
+      },
+      version: process.env.VERSION,
+    };
+    access_token = funcs.genJWT(jwt_data);
+    await user.save();
+    return funcs.sendSuccess(res, jwt_data, 201, access_token);
+  } catch (err: any) {
+    return funcs.sendError(res, err.err_message || err, err.err_code);
+  }
 });
 
-router.post("/register", (req, res) => {
-  let { username, email, password, confirm_password } = req.body;
+router.post("/signup", async (req, res) => {
+  let { username, email, password } = req.body;
 
-  if (!username || !email || !password || !confirm_password) {
-    return funcs.sendError(res, "Some fields are missing", 422);
-  }
-
-  if (password !== confirm_password) {
-    return funcs.sendError(res, "Passwords must be same", 422);
+  if (!username || !email || !password) {
+    return funcs.sendError(res, "Missing some required fields!", 422);
   }
 
   password = funcs.get_hash(password);
 
   let jwt_data: string | object;
   let access_token: string;
-
-  models.User.findOne({ username })
-    .then((user: any) => {
-      if (!user)
-        return models.Profile.create({
-          username: username,
-          password: password,
-          email: email,
-        });
-      return funcs.sendError(res, "Username already exists!", 400);
-    })
-    .then((profile: { _id: any }) => {
-      return models.User.create({ profile: profile._id });
-    })
-    .then((user: { _id: any; last_login: Date; save: () => any }) => {
+  try {
+    let user: any = await models.User.findOne({ username });
+    if (!user) {
+      const profile = await models.Profile.create({
+        username: username,
+        password: password,
+        email: email,
+      });
+      user = await models.User.create({ profile: profile._id });
       jwt_data = {
         data: {
           id: user._id,
         },
-        isloggedIn: true,
-        version: process.env.VERSION as string,
+        version: process.env.VERSION,
       };
       access_token = funcs.genJWT(jwt_data);
-      user.last_login = new Date();
-      return user.save();
-    })
-    .then((_: any) => {
-      return funcs.sendSuccess(res, jwt_data, 201, access_token);
-    })
-    .catch((err: { err_message: any; err_code: number }) => {
-      return funcs.sendError(res, err.err_message || err, err.err_code);
-    });
+    } else return funcs.sendError(res, "Username already exists!", 400);
+
+    return funcs.sendSuccess(res, jwt_data, 201, access_token);
+  } catch (err: any) {
+    return funcs.sendError(res, err.err_message || err, err.err_code);
+  }
 });
 
-router.delete("/logout", jwtManager, (req: any, res: Response, next) => {
-  const _id = req.jwt_data.data.id;
-
-  models.User.findOneAndUpdate({ _id }, { $unset: { access_token: 1 } })
-    .then((user: any) => {
-      if (!user) return funcs.sendError(res, "User not exists!", 401);
-
-      return funcs.sendSuccess(res, "Loggedout Successfully !!", 200, null);
-    })
-    .catch(next);
+router.delete("/logout", jwtManager, async (req: any, res: Response, next) => {
+  const _id: string = req.jwt_data.data.id;
+  try {
+    let user: any = await models.User.findOneAndUpdate(
+      { _id },
+      { $unset: { access_token: 1 } }
+    );
+    if (!user) return funcs.sendError(res, "User not exists!", 401);
+    return funcs.sendSuccess(res, "Loggedout Successfully !!", 200, null);
+  } catch (err: any) {
+    next();
+  }
 });
