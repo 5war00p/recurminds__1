@@ -13,7 +13,7 @@ router.post("/new", async (req: any, res: any, next) => {
     return funcs.sendError(res, "Invalid UserID!", 403);
 
   if (!platform || !username)
-    return funcs.sendSuccess(res, "Missing some required fields!", 422);
+    return funcs.sendError(res, "Missing some required fields!", 422);
 
   try {
     const platformProfile: any = await models.PlatformProfile.create({
