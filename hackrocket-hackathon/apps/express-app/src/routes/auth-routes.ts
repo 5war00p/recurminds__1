@@ -11,30 +11,34 @@ router.get("/login", async (req: Request, res: Response) => {
 });
 
 router.post("/login", async (req, res) => {
-  const { username, password, email } = req.body;
+  const { username, password } = req.body;
 
-  if ((!username && !email) || !password)
+  if (!username || !password)
     return funcs.sendError(res, "Missing some required fields!", 422);
 
   let jwt_data: string | object;
   let access_token: string;
   try {
-    let user: any = await models.Profile.findOne({ username, email });
-    if (!user)
+    let profile: any = await models.Profile.findOne({ username });
+    if (!profile)
       return funcs.sendError(
         res,
         "Seems entered user details not exists!",
         401
       );
-    const auth = bcrypt.compareSync(password, user.password);
+    const auth = bcrypt.compareSync(password, profile.password);
     if (!auth) return funcs.sendError(res, "Incorrect credentials", 401);
     jwt_data = {
       data: {
-        id: user._id,
+        id: profile._id,
       },
       version: process.env.VERSION,
     };
     access_token = funcs.genJWT(jwt_data);
+    let user: any = await models.User.findOneAndUpdate(
+      { profile: profile._id },
+      { access_token: access_token }
+    );
     await user.save();
     return funcs.sendSuccess(res, jwt_data, 201, access_token);
   } catch (err: any) {
@@ -64,7 +68,7 @@ router.post("/signup", async (req, res) => {
       user = await models.User.create({ profile: profile._id });
       jwt_data = {
         data: {
-          id: user._id,
+          id: profile._id,
         },
         version: process.env.VERSION,
       };
@@ -81,11 +85,11 @@ router.delete("/logout", jwtManager, async (req: any, res: Response, next) => {
   const _id: string = req.jwt_data.data.id;
   try {
     let user: any = await models.User.findOneAndUpdate(
-      { _id },
+      { profile: _id },
       { $unset: { access_token: 1 } }
     );
     if (!user) return funcs.sendError(res, "User not exists!", 401);
-    return funcs.sendSuccess(res, "Loggedout Successfully !!", 200, null);
+    return funcs.sendSuccess(res, "Loggedout Successfully !!", 200);
   } catch (err: any) {
     next();
   }

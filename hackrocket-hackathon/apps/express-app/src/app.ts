@@ -3,18 +3,18 @@ import { db } from "./models";
 import cors from "cors";
 import { publicEnv } from "../env";
 import { jwtManager } from "./utils/jwtManager";
-import { router as AuthRouter } from "./routes/auth-routes";
-const app = express();
-
-import { router as OtherRouter } from "./routes/other-routes";
+import { router as AuthRoutes } from "./routes/auth-routes";
+import { router as ProfileRoutes } from "./routes/profile-routes";
 import { funcs } from "./utils/funcs";
+
+const app = express();
 
 app.set("case sensitive routing", true);
 app.use(express.json({ limit: "5MB" }));
 app.use(cors());
 
-app.use("/auth", AuthRouter);
-app.use("/other", jwtManager, OtherRouter);
+app.use("/auth", AuthRoutes);
+app.use("/profile", jwtManager, ProfileRoutes);
 
 app.use(
   (
