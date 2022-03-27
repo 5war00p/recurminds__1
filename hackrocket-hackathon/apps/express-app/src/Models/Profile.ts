@@ -25,13 +25,19 @@ const ProfileSchema = new mongoose.Schema(
     friends: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        ref: "Profile",
+      },
+    ],
+    following: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Profile",
       },
     ],
     followers: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        ref: "Profile",
       },
     ],
   },

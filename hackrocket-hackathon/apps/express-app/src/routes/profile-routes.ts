@@ -20,7 +20,6 @@ router.get("/", async (req: any, res: Response, next) => {
           populate: [{ path: "friends" }, { path: "followers" }],
           select: { password: 0 },
         },
-        { path: "connections" },
         { path: "platform_profiles" },
       ]);
 

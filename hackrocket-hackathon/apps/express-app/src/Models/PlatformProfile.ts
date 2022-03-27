@@ -4,10 +4,12 @@ const PlatformProfileSchema = new mongoose.Schema(
   {
     name: {
       type: String,
+      enum: ["HackerRank", "GitHub"],
       required: true,
     },
     details: {
       type: Object,
+      required: true,
     },
   },
   { timestamps: true }

@@ -7,12 +7,10 @@ const ConnectionSchema = new mongoose.Schema(
       enum: ["IncomingRequest", "Requested"],
       required: true,
     },
-    user_id: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-      },
-    ],
+    user_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Profile",
+    },
   },
   { timestamps: true }
 ) as never;
