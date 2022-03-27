@@ -8,6 +8,7 @@ const ProfileSchema = new mongoose.Schema(
     username: {
       type: String,
       required: true,
+      unique: true,
     },
     password: {
       type: String,
@@ -16,6 +17,7 @@ const ProfileSchema = new mongoose.Schema(
     email: {
       type: String,
       required: true,
+      unique: true,
     },
     designation: {
       type: String,
