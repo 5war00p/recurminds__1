@@ -9,7 +9,7 @@ export const HackerRank = {
 };
 
 export const Github = {
-  repos: "https://api.github.com/users/{}/repos",
+  repos: `https://api.github.com/users/{username}/repos`,
   user: "https://api.github.com/users/{}",
   orgs: "https://api.github.com/users/b4s36t4/orgs",
 };

@@ -6,9 +6,11 @@ import {
   Tabs,
   Typography,
 } from "@mui/material";
+import axios from "axios";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import AppTopBar from "../../components/app-bar";
+import { Github } from "../../consts";
 
 function a11yProps(index: number) {
   return {
@@ -64,9 +66,17 @@ function UserProfile() {
   };
 
   useEffect(() => {
-    if (value === 0) {
-      setIsloading(true);
-    }
+    const call = async () => {
+      if (value === 0) {
+        setIsloading(true);
+        try {
+          const req = await axios.get(Github["user"])
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    };
+    call();
   }, [value]);
 
   return (

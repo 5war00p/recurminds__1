@@ -147,7 +147,10 @@ function Profile() {
     setCurrentPlatformCount(count - 1);
   };
   const onSubmit = () => {
-    console.log(platformData, email, Password);
+    try {
+    } catch (error) {
+      console.log(error);
+    }
   };
   return (
     <>
