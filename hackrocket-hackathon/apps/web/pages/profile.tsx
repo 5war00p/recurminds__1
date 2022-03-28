@@ -148,13 +148,29 @@ function Profile() {
   };
   const onSubmit = () => {
     try {
+      console.log("Submitting...");
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  const logout = () => {
+    if (window) {
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("username");
+      setTimeout(() => {
+        router.reload();
+      }, 1000);
     }
   };
   return (
     <>
       <AppTopBar currentPath={"/profile"} />
+      <Box style={{ marginTop: 20, marginLeft: 10 }}>
+        <Button onClick={logout} variant="contained">
+          Logout
+        </Button>
+      </Box>
       <Container>
         <Typography variant="h4" mt={"20px"}>
           {isEdit ? "Edit Profile" : "View Profile"}

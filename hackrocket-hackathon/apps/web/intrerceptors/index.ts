@@ -5,7 +5,7 @@ const interceptedAxios = axios.create();
 // interceptedAxios.defaults.headers.common["x-dev-profile-access-token"] =
 //   (window && window.localStorage.getItem("access_token")) || "";
 
-interceptedAxios.defaults.baseURL = "http://localhost:9080/";
+interceptedAxios.defaults.baseURL = "http://44.202.133.235:9080/";
 interceptedAxios.interceptors.request.use(
   (config) => {
     if (config?.headers) {
